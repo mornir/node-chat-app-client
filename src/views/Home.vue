@@ -16,7 +16,7 @@
         </div>
         <div class="error-message" v-if="err">{{ err }}</div>
         <div class="form-field">
-          <button type="submit">JOIN</button>
+          <button type="submit" :disabled="disableButton">JOIN</button>
         </div>
       </form>
     </div>
@@ -31,27 +31,29 @@ export default {
       name: '',
       room: '',
       err: null,
+      disableButton: true,
     }
   },
   sockets: {
     connect_error(err) {
       console.error(err)
+      this.disableButto = true
       this.err = `Cannot connect to server: ${err.message}`
+    },
+    connect() {
+      console.log('connect')
+      this.disableButton = false
+    },
+    reconnect() {
+      console.log('reconnect')
+      this.disableButton = false
     },
   },
   methods: {
     goToRoom() {
-      this.$socket.emit('join', { name: this.name, room: this.room }, err => {
-        if (err) {
-          alert(err)
-        } else {
-          console.log('No error')
-
-          this.$router.push({
-            name: 'chat-room',
-            params: { name: this.name, room: this.room },
-          })
-        }
+      this.$router.push({
+        name: 'chat-room',
+        params: { name: this.name, room: this.room },
       })
     },
   },

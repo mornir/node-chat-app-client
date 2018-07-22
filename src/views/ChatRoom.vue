@@ -23,13 +23,11 @@
           <button type="submit">Send</button>
         </form>
 
-        <!--   <button @click="startAudioChat" style="margin-right: 0.2rem">Audio Chat</button> -->
-        <button @click="sendLocation" :disabled="isButtonDisabled">{{ sendLocationButtonText }}</button>
+        <button @click="startAudioChat">Audio Chat</button>
 
       </footer>
     </section>
-
-    <!--     <audio id="audio-tag" autoplay playsinline></audio> -->
+    <audio id="audio-tag" autoplay playsinline></audio>
   </div>
 </template>
 
@@ -52,15 +50,51 @@ export default {
       message: '',
       messages: [],
       isButtonDisabled: false,
-      sendLocationButtonText: 'Send Location',
       users: ['Henry', 'David'],
       peer: null,
     }
   },
   sockets: {
+    updateUserList(users) {
+      this.users = users
+    },
     newMessage(msg) {
       console.log(msg)
       this.messages.push(msg)
+    },
+    transmitOffer({ name, data }) {
+      console.log('receiving Offer', data)
+
+      this.messages.push({
+        from: 'Admin',
+        text: `${name} would like to start an audio conversation with <b>you</b>`,
+        createAt: new Date().getTime(),
+      })
+
+      if (this.peer === null) {
+        // peer 2
+        this.peer = new SimplePeer({
+          initiator: false,
+          config: {
+            iceServers: [
+              {
+                urls: 'stun:stun.l.google.com:19302',
+              },
+              {
+                urls: 'stun:global.stun.twilio.com:3478?transport=udp',
+              },
+              {
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'hiragana',
+                username: 'mornirmornir@hotmail.com',
+              },
+            ],
+          },
+        })
+        this.bindEvents(this.peer)
+      }
+
+      this.peer.signal(data)
     },
   },
   methods: {
@@ -69,23 +103,56 @@ export default {
         this.message = ''
       })
     },
-    sendLocation() {
-      this.isButtonDisabled = true
-      this.sendLocationButtonText = 'Sending location...'
-      navigator.geolocation.getCurrentPosition(
-        ({ coords: { latitude, longitude } }) => {
-          this.$socket.emit('createLocationMessage', {
-            latitude,
-            longitude,
-          })
-        },
-        () => {
-          alert('Unable to fetch location.')
-          this.isButtonDisabled = false
-          this.sendLocationButtonText = 'Send Location'
-        }
-      )
+    async startAudioChat() {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        })
+
+        this.peer = new SimplePeer({
+          initiator: true,
+          stream,
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+              {
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'hiragana',
+                username: 'mornirmornir@hotmail.com',
+              },
+            ],
+          },
+        })
+        this.bindEvents(this.peer)
+      } catch (e) {
+        console.log(e.message)
+      }
     },
+    bindEvents(p) {
+      p.on('error', err => {
+        console.log(err)
+      })
+
+      p.on('signal', data => {
+        this.$socket.emit('createOffer', data)
+      })
+
+      p.on('stream', stream => {
+        console.log('got remote audio stream', stream)
+        document.querySelector('#audio-tag').srcObject = stream
+      })
+    },
+  },
+  created() {
+    this.$socket.emit('join', { name: this.name, room: this.room }, err => {
+      if (err) {
+        alert(err)
+      } else {
+        console.log('No error')
+      }
+    })
   },
   components: {
     ChatMessage,
