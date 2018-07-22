@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import SimplePeer from 'simple-peer'
+
 import ChatMessage from '@/components/ChatMessage'
 export default {
   name: 'chat-room',
