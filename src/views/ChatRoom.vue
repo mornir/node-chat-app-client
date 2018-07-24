@@ -23,7 +23,7 @@
           <button type="submit">Send</button>
         </form>
 
-        <button @click="startAudioChat2">Audio Chat</button>
+        <button @click="startAudioChat">Audio Chat</button>
 
       </footer>
     </section>
@@ -141,7 +141,7 @@ export default {
         console.log(e.message)
       }
     },
-    async startAudioChat2() {
+    async startAudioChat() {
       try {
         this.myAudioStream = await navigator.mediaDevices.getUserMedia({
           video: false,

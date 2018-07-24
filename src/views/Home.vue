@@ -35,6 +35,8 @@ export default {
     }
   },
   sockets: {
+    // prevent joining if server is not up and running
+    // in main.js linking socket.io to vue-sockets triggers the connect hook immediately on the first page displayed.
     connect_error(err) {
       console.error(err)
       this.disableButto = true
