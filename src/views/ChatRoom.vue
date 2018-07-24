@@ -23,10 +23,11 @@
           <button type="submit">Send</button>
         </form>
 
-        <button @click="startAudioChat">Audio Chat</button>
+        <button @click="startAudioChat2">Audio Chat</button>
 
       </footer>
     </section>
+    <v-dialog/>
     <audio id="audio-tag" autoplay playsinline></audio>
   </div>
 </template>
@@ -54,9 +55,26 @@ export default {
       isButtonDisabled: false,
       users: ['Henry', 'David'],
       peer: null,
+      myAudioStream: null,
     }
   },
   sockets: {
+    shareAudioModal() {
+      this.$modal.show('dialog', {
+        title: 'Start Audio Conversation',
+        text: 'User XX would like to start an audio chat with you.',
+        buttons: [
+          {
+            title: 'Accept', // Button title
+            default: true, // Will be triggered by default if 'Enter' pressed.
+            handler: this.acceptAudioChat, // Button click handler
+          },
+          {
+            title: 'Refuse',
+          },
+        ],
+      })
+    },
     updateUserList(users) {
       this.users = users
     },
@@ -67,11 +85,11 @@ export default {
     transmitOffer({ name, data }) {
       console.log('receiving Offer', data)
 
-      this.messages.push({
+      /*       this.messages.push({
         from: 'Admin',
         text: `${name} would like to start an audio conversation with <b>you</b>`,
         createAt: new Date().getTime(),
-      })
+      }) */
 
       if (this.peer === null) {
         // peer 2
@@ -100,7 +118,27 @@ export default {
     },
   },
   methods: {
+    acceptAudioChat() {
+      console.log('YES!!')
+      this.$modal.hide('dialog')
+
+      this.startAudioChat()
+    },
+    async startAudioChat2() {
+      try {
+        this.myAudioStream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        })
+        this.$socket.emit('askAudio')
+      } catch (e) {
+        console.log(e.message)
+      }
+    },
     sendMessage() {
+      /*       console.log('audioStream', this.myAudioStream)
+      document.querySelector('#audio-tag').srcObject = this.myAudioStream */
+
       this.$socket.emit('createMessage', { text: this.message }, () => {
         this.message = ''
       })

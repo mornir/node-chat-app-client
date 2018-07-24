@@ -7,7 +7,7 @@
       </span>
     </div>
     <div class="message__body">
-      <p v-if="msg.text"> {{ msg.text }}</p>
+      <p v-if="msg.text">{{ msg.text }}</p>
       <p v-else>
         <a :href="msg.url" target="_blank">My location</a>
       </p>
