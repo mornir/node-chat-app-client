@@ -6,7 +6,7 @@ import router from './router'
 
 Vue.config.productionTip = false
 
-Vue.use(VueSocketio, io('https://chat-app-without-pusher.herokuapp.com'))
+Vue.use(VueSocketio, io(process.env.VUE_SOCKET_SERVER))
 
 new Vue({
   router,
