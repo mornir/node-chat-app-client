@@ -84,13 +84,6 @@ export default {
     },
     transmitOffer({ name, data }) {
       console.log('receiving Offer', data)
-
-      /*       this.messages.push({
-        from: 'Admin',
-        text: `${name} would like to start an audio conversation with <b>you</b>`,
-        createAt: new Date().getTime(),
-      }) */
-
       if (this.peer === null) {
         // peer 2
         this.peer = new SimplePeer({
@@ -136,39 +129,27 @@ export default {
       }
     },
     sendMessage() {
-      /*       console.log('audioStream', this.myAudioStream)
-      document.querySelector('#audio-tag').srcObject = this.myAudioStream */
-
       this.$socket.emit('createMessage', { text: this.message }, () => {
         this.message = ''
       })
     },
     async startAudioChat() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: false,
-          audio: true,
-        })
-
-        this.peer = new SimplePeer({
-          initiator: true,
-          stream,
-          config: {
-            iceServers: [
-              { urls: 'stun:stun.l.google.com:19302' },
-              { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-              {
-                urls: 'turn:numb.viagenie.ca',
-                credential: 'hiragana',
-                username: 'mornirmornir@hotmail.com',
-              },
-            ],
-          },
-        })
-        this.bindEvents(this.peer)
-      } catch (e) {
-        console.log(e.message)
-      }
+      this.peer = new SimplePeer({
+        initiator: true,
+        stream: this.myAudioStream,
+        config: {
+          iceServers: [
+            { urls: 'stun:stun.l.google.com:19302' },
+            { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+            {
+              urls: 'turn:numb.viagenie.ca',
+              credential: 'hiragana',
+              username: 'mornirmornir@hotmail.com',
+            },
+          ],
+        },
+      })
+      this.bindEvents(this.peer)
     },
     bindEvents(p) {
       p.on('error', err => {
