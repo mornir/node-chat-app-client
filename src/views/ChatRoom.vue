@@ -88,6 +88,7 @@ export default {
         // peer 2
         this.peer = new SimplePeer({
           initiator: false,
+          stream: this.myAudioStream,
           config: {
             iceServers: [
               {
@@ -111,11 +112,34 @@ export default {
     },
   },
   methods: {
-    acceptAudioChat() {
+    async acceptAudioChat() {
       console.log('YES!!')
       this.$modal.hide('dialog')
 
-      this.startAudioChat()
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: false,
+          audio: true,
+        })
+        this.peer = new SimplePeer({
+          initiator: true,
+          stream,
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
+              {
+                urls: 'turn:numb.viagenie.ca',
+                credential: 'hiragana',
+                username: 'mornirmornir@hotmail.com',
+              },
+            ],
+          },
+        })
+        this.bindEvents(this.peer)
+      } catch (e) {
+        console.log(e.message)
+      }
     },
     async startAudioChat2() {
       try {
@@ -132,24 +156,6 @@ export default {
       this.$socket.emit('createMessage', { text: this.message }, () => {
         this.message = ''
       })
-    },
-    async startAudioChat() {
-      this.peer = new SimplePeer({
-        initiator: true,
-        stream: this.myAudioStream,
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:global.stun.twilio.com:3478?transport=udp' },
-            {
-              urls: 'turn:numb.viagenie.ca',
-              credential: 'hiragana',
-              username: 'mornirmornir@hotmail.com',
-            },
-          ],
-        },
-      })
-      this.bindEvents(this.peer)
     },
     bindEvents(p) {
       p.on('error', err => {
