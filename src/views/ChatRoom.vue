@@ -59,10 +59,10 @@ export default {
     }
   },
   sockets: {
-    shareAudioModal() {
+    shareAudioModal(name) {
       this.$modal.show('dialog', {
         title: 'Start Audio Conversation',
-        text: 'User XX would like to start an audio chat with you.',
+        text: name + 'would like to start an audio chat with you.',
         buttons: [
           {
             title: 'Accept', // Button title
@@ -82,7 +82,7 @@ export default {
       console.log(msg)
       this.messages.push(msg)
     },
-    transmitOffer({ name, data }) {
+    transmitOffer(data) {
       console.log('receiving Offer', data)
       if (this.peer === null) {
         // peer 2
