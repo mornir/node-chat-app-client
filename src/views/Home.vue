@@ -11,7 +11,7 @@
           <input type="text" name="name" autofocus required v-model="name">
         </div>
         <div class="form-field">
-          <label for="room">Roon name</label>
+          <label for="room">Room name</label>
           <input type="text" name="room" required v-model="room">
         </div>
         <div class="error-message" v-if="err">{{ err }}</div>
