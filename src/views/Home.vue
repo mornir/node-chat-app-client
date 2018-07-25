@@ -31,7 +31,7 @@ export default {
       name: '',
       room: '',
       err: null,
-      disableButton: true,
+      disableButton: !this.$socket.connected,
     }
   },
   sockets: {
