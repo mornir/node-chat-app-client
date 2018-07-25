@@ -53,10 +53,7 @@ export default {
   },
   methods: {
     goToRoom() {
-      this.$router.push({
-        name: 'chat-room',
-        params: { name: this.name, room: this.room },
-      })
+      this.$router.push(`/chat-room/${this.room}/${this.name}`)
     },
   },
 }

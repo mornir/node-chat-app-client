@@ -13,7 +13,7 @@ export default new Router({
       component: Home,
     },
     {
-      path: '/chat-room',
+      path: '/chat-room/:room/:name',
       name: 'chat-room',
       component: ChatRoom,
       props: true,
