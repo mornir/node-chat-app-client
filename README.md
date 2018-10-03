@@ -17,7 +17,10 @@ Before starting the conversation via WebRTC, we want to check 2 things :
 These two points are the reason why we only store the media stream and do not already iniate the peer-to-peer communication.
 Instead we wait for the receiver to accept the audio call. It then can seem counter-intuitive, but it is actually the receiver that iniates the peer-to-peer communication, since we know that user 1 want that communication and has already given access to his microphone. When user 1 receives the offer from user 2, we make use of the store media stream.
 
-## Resources used
+# backend
+https://github.com/mornir/node-chat-app
+
+# Resources used
 
 ### WebSockets
 
